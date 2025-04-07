@@ -1,0 +1,44 @@
+name: redis
+services:
+  postgres_database_testing_poc:
+    image: postgres:17-alpine3.21  
+    container_name: postgres_database_testing_poc
+    environment:
+      POSTGRES_USER: postgres_database_testing_poc
+      POSTGRES_PASSWORD: postgres_database_testing_poc
+      POSTGRES_DB: postgres_database_testing_poc
+    ports:
+      - 5432:5432
+    volumes:
+      - pg_storage:/var/lib/postgresql/data
+  redis:
+    container_name: redis-server
+    image: redis:7.4.2-alpine3.21
+    hostname: redis-server
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-server-volume:/data
+    command: redis-server
+    networks:
+      - network
+
+  redis-insight:
+    container_name: redis-insight-dashboard-app
+    hostname: redis-insight-dashboard-app
+    image: redislabs/redisinsight:latest # DOESN'T SUPPORT ALPINE VERSIONS
+    ports:
+      - "5540:5540"
+    volumes:
+      - redis-insight-volume:/data
+    networks:
+      - network
+
+volumes:
+  pg_storage:
+  redis-server-volume:
+  redis-insight-volume:
+
+networks:
+  network:
+    driver: bridge
